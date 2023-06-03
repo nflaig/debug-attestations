@@ -7,7 +7,8 @@ const MAX_REQUESTS_COUNT = 1;
 const INTERVAL_MS = 1000;
 const RETRY_DELAY_MS = 30000;
 
-const LATE_ATT_INCLUSION_DELAY = 4;
+// Attestations with inclusion delay >= this value are considered late
+const LATE_ATT_INCLUSION_DELAY = 3;
 
 const api = axios.create();
 
@@ -87,12 +88,12 @@ async function checkAttestationsForIndex(validatorIndex) {
       const slotDetails = await fetchSlotDetails(attestation.attesterslot + 1);
       const blockMissed = slotDetails.status === "ERROR: could not retrieve db results";
       missedAttestations.push({ ...attestation, blockMissed });
-    } else if (attestation.inclusionslot - attestation.attesterslot >= LATE_ATT_INCLUSION_DELAY) {
+    } else if (attestation.inclusionslot - attestation.attesterslot - 1 >= LATE_ATT_INCLUSION_DELAY) {
       const slotDetails = await fetchSlotDetails(attestation.attesterslot + 1);
       const blockMissed = slotDetails.status === "ERROR: could not retrieve db results";
       if (blockMissed) {
         // subtract the missed slot from inclusion delay as it can not be included without a block
-        const optimalInclusionDelay = attestation.inclusionslot - attestation.attesterslot - 1;
+        const optimalInclusionDelay = attestation.inclusionslot - attestation.attesterslot - 2;
 
         if (optimalInclusionDelay >= LATE_ATT_INCLUSION_DELAY) {
           lateAttestations.push({ ...attestation, blockMissed });
@@ -211,7 +212,7 @@ function createMarkdownTable(attestations) {
   for (const attestation of attestations) {
     const inclusionSlot = attestation.inclusionslot !== 0 ? attestation.inclusionslot : null;
     const inclusionSlotWithDelay = inclusionSlot
-      ? `${inclusionSlot} (${inclusionSlot - attestation.attesterslot})`
+      ? `${inclusionSlot} (${inclusionSlot - attestation.attesterslot - 1})`
       : "null";
     mdData += `| ${attestation.validatorindex} | ${attestation.attesterslot} | ${inclusionSlotWithDelay} | ${attestation.blockMissed} |\n`;
   }
