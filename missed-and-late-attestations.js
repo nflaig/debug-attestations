@@ -3,9 +3,9 @@ const fs = require("fs");
 const readline = require("readline");
 const path = require("path");
 
-const MAX_REQUESTS_COUNT = 2;
+const MAX_REQUESTS_COUNT = 1;
 const INTERVAL_MS = 1000;
-const RETRY_DELAY_MS = 5000;
+const RETRY_DELAY_MS = 30000;
 
 const LATE_ATT_INCLUSION_DELAY = 4;
 
@@ -53,6 +53,7 @@ async function fetchValidatorAttestations(validatorIndex) {
     return response.data;
   } catch (error) {
     console.error(`Failed to fetch validator attestations: ${error}`);
+    return null;
   }
 }
 
@@ -70,6 +71,11 @@ async function fetchSlotDetails(slot) {
 async function checkAttestationsForIndex(validatorIndex) {
   console.log(`Processing validator index: ${validatorIndex}`);
   const attestationsData = await fetchValidatorAttestations(validatorIndex);
+  if (!attestationsData) {
+    // Fetching validator attestations failed
+    return null;
+  }
+
   let lateAttestations = [];
   let missedAttestations = [];
   let attestationCount = attestationsData.data.length;
@@ -115,7 +121,13 @@ async function processValidatorIndexesFile() {
     if (!validatorIndex) {
       continue;
     }
-    const { attestationCount, missedAttestations, lateAttestations } = await checkAttestationsForIndex(validatorIndex);
+    const attestationData = await checkAttestationsForIndex(validatorIndex);
+    if (!attestationData) {
+      continue;
+    }
+
+    const { attestationCount, missedAttestations, lateAttestations } = attestationData;
+
     totalAttestations += attestationCount;
     totalMissedAttestations = totalMissedAttestations.concat(missedAttestations);
     totalLateAttestations = totalLateAttestations.concat(lateAttestations);
