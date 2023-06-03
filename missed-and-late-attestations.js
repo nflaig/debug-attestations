@@ -186,7 +186,7 @@ function createSummaryMarkdown(
   const missedWithMissedBlockPercentage = calculatePercentage(totalMissedWithMissedBlock, totalAttestations);
 
   let mdData = `# Summary\n\n`;
-  mdData += "Missed and late attestations during last 10 epochs\n\n";
+  mdData += "Missed and late attestations during last 100 epochs\n\n";
   mdData += `| Metric                                        | Count | Percentage |\n`;
   mdData += `| --------------------------------------------- | ----- | ---------- |\n`;
   mdData += `| Total Attestations                            | ${totalAttestations}              | 100%       |\n`;
