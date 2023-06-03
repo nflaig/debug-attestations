@@ -90,7 +90,16 @@ async function checkAttestationsForIndex(validatorIndex) {
     } else if (attestation.inclusionslot - attestation.attesterslot >= LATE_ATT_INCLUSION_DELAY) {
       const slotDetails = await fetchSlotDetails(attestation.attesterslot + 1);
       const blockMissed = slotDetails.status === "ERROR: could not retrieve db results";
-      lateAttestations.push({ ...attestation, blockMissed });
+      if (blockMissed) {
+        // subtract the missed slot from inclusion delay as it can not be included without a block
+        const optimalInclusionDelay = attestation.inclusionslot - attestation.attesterslot - 1;
+
+        if (optimalInclusionDelay >= LATE_ATT_INCLUSION_DELAY) {
+          lateAttestations.push({ ...attestation, blockMissed });
+        }
+      } else {
+        lateAttestations.push({ ...attestation, blockMissed });
+      }
     }
   }
 
