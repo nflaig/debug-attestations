@@ -8,7 +8,7 @@ const INTERVAL_MS = 1000;
 const RETRY_DELAY_MS = 30000;
 
 // Attestations with inclusion delay >= this value are considered late
-const LATE_ATT_INCLUSION_DELAY = 3;
+const LATE_ATT_INCLUSION_DELAY = 1;
 
 const api = axios.create();
 
