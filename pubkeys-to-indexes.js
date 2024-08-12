@@ -5,8 +5,8 @@ async function fetchValidators(pubkeys) {
   const BASE_URL = "https://lodestar-mainnet.chainsafe.io";
   const state_id = "head";
   const pubkeysNoPrefix = pubkeys.map((p) => p.replace("0x", ""));
-  const url = `${BASE_URL}/eth/v1/beacon/states/${state_id}/validators?id=0x${pubkeysNoPrefix.join(",0x")}`;
-  const response = await axios.get(url);
+  const url = `${BASE_URL}/eth/v1/beacon/states/${state_id}/validators`;
+  const response = await axios.post(url, { ids: pubkeysNoPrefix.map((p) => `0x${p}`) });
 
   if (response.data && response.data.data) {
     return response.data.data;
