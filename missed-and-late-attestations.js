@@ -64,7 +64,10 @@ async function fetchSlotDetails(slot) {
     const response = await api.get(url);
     return response.data;
   } catch (error) {
-    console.error(`Failed to fetch slot ${slot} details: ${error}`);
+    // Expected error if block was missed for slot
+    if (error.response?.data?.status !== "ERROR: could not retrieve db results") {
+      console.error(`Failed to fetch slot ${slot} details: ${error}`, error.response?.data);
+    }
     return { status: "ERROR: could not retrieve db results" };
   }
 }
