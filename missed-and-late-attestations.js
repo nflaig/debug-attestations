@@ -53,7 +53,7 @@ async function fetchValidatorAttestations(validatorIndex) {
     const response = await api.get(url);
     return response.data;
   } catch (error) {
-    console.error(`Failed to fetch validator attestations: ${error}`, error.response?.data);
+    console.error(`Failed to fetch validator attestations: ${error}`);
     return null;
   }
 }
@@ -64,7 +64,7 @@ async function fetchSlotDetails(slot) {
     const response = await api.get(url);
     return response.data;
   } catch (error) {
-    console.error(`Failed to fetch slot ${slot} details: ${error}`, error.response?.data);
+    console.error(`Failed to fetch slot ${slot} details: ${error}`);
     return { status: "ERROR: could not retrieve db results" };
   }
 }
